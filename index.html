@@ -41,6 +41,7 @@
   <button onclick="encode()">Encode 🔒</button>
   <button onclick="decode()">Decode 🔓</button>
   <button onclick="copyOutput()">Copy 📋</button>
+  <button onclick="resetAll()">Reset ♻️</button>
 
   <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
 
@@ -77,9 +78,14 @@
     function copyOutput() {
       let out = document.getElementById("output");
       out.select();
-      out.setSelectionRange(0, 99999); // for mobile
+      out.setSelectionRange(0, 99999); // mobile support
       navigator.clipboard.writeText(out.value);
       alert("Copied to clipboard! ✅");
+    }
+
+    function resetAll() {
+      document.getElementById("input").value = "";
+      document.getElementById("output").value = "";
     }
   </script>
 </body>
