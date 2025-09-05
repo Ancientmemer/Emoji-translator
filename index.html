@@ -11,13 +11,14 @@
       background: #f5f5f5; 
       padding: 20px;
     }
-    textarea { 
+    textarea, #output { 
       width: 90%; 
-      height: 80px; 
+      min-height: 80px; 
       margin: 10px 0; 
-      font-size: 16px; 
+      font-size: 18px; 
       padding: 10px; 
       border-radius: 10px; 
+      border: 1px solid #ccc;
     }
     button { 
       margin: 5px; 
@@ -30,14 +31,6 @@
       cursor: pointer; 
     }
     button:hover { background: #e68900; }
-    #output {
-      font-size: 20px; 
-      margin-top: 20px; 
-      padding: 15px; 
-      background: white; 
-      border-radius: 10px; 
-      min-height: 40px;
-    }
   </style>
 </head>
 <body>
@@ -47,11 +40,12 @@
   <textarea id="input" placeholder="Type your secret message..."></textarea><br>
   <button onclick="encode()">Encode 🔒</button>
   <button onclick="decode()">Decode 🔓</button>
+  <button onclick="copyOutput()">Copy 📋</button>
 
-  <div id="output"></div>
+  <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
 
   <script>
-    // Simple mapping (A-Z + space)
+    // Mapping (A-Z + space)
     const map = {
       "A": "😀", "B": "🐒", "C": "🌙", "D": "🍩", "E": "🥚",
       "F": "🍟", "G": "🦍", "H": "🏠", "I": "🍦", "J": "🕹️",
@@ -61,7 +55,6 @@
       "Z": "⚡", " ": "⬜"
     };
 
-    // Reverse mapping
     const reverseMap = Object.fromEntries(
       Object.entries(map).map(([k,v]) => [v,k])
     );
@@ -69,7 +62,7 @@
     function encode() {
       let text = document.getElementById("input").value.toUpperCase();
       let encoded = text.split("").map(ch => map[ch] || ch).join("");
-      document.getElementById("output").innerText = encoded;
+      document.getElementById("output").value = encoded;
     }
 
     function decode() {
@@ -78,7 +71,15 @@
       for (let ch of text) {
         decoded += reverseMap[ch] || ch;
       }
-      document.getElementById("output").innerText = decoded;
+      document.getElementById("output").value = decoded;
+    }
+
+    function copyOutput() {
+      let out = document.getElementById("output");
+      out.select();
+      out.setSelectionRange(0, 99999); // for mobile
+      navigator.clipboard.writeText(out.value);
+      alert("Copied to clipboard! ✅");
     }
   </script>
 </body>
