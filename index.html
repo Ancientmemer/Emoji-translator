@@ -1,104 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Cipher</title>
-  <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      background: #f5f5f5; 
-      padding: 20px;
-    }
-    textarea, #output { 
-      width: 90%; 
-      min-height: 80px; 
-      margin: 10px 0; 
-      font-size: 18px; 
-      padding: 10px; 
-      border-radius: 10px; 
-      border: 1px solid #ccc;
-    }
-    button { 
-      margin: 5px; 
-      padding: 10px 20px; 
-      font-size: 16px; 
-      border: none; 
-      border-radius: 8px; 
-      background: #ff9800; 
-      color: white; 
-      cursor: pointer; 
-    }
-    button:hover { background: #e68900; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="title" content="Glyphmoji - Emoji & Unicode Cipher Tool">
+<meta name="description" content="Convert text into emojis or Unicode (\uXXXX). Supports English & Malayalam. Fun cipher tool for secret messages.">
+<meta name="keywords" content="emoji cipher, unicode converter, Malayalam emoji, secret code, glyphmoji">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Glyphmoji - Low/High Security</title>
+<style>
+body{font-family:system-ui,Arial;background:#f7f7fd;color:#111;padding:18px;text-align:center;}
+.card{max-width:900px;margin:12px auto;background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(20,20,50,.06);}
+textarea{width:92%;min-height:90px;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:16px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+button{padding:10px 14px;border-radius:10px;border:0;background:#5b21b6;color:#fff;cursor:pointer;font-weight:600}
+.muted{background:#eef2ff;color:#111;border:0}
+.controls {display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+#output{min-height:80px}
+.small{font-size:13px;color:#555;margin-top:8px}
+.chart{margin:14px auto;max-width:760px;text-align:left;border-collapse:collapse;}
+.chart td{padding:8px;border:1px solid #eee;font-size:18px}
+.pill{padding:6px 10px;border-radius:999px;background:#f1f5f9;border:1px solid #e2e8f0;margin:4px;display:inline-block;
+/* CSS */
+.nice-list {
+  margin: 0;
+  padding: 0 0 0 1.25rem; /* left padding for default bullets */
+  list-style: disc;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #222;
+  text-align: left;
+}
+.nice-list li {
+  margin: .35rem 0;
+  font-size: 16px;
+}
+}
+</style>
 </head>
 <body>
-  <h1>🔐 Emoji Cipher</h1>
-  <p>Type text and encode into secret emoji language 🔄</p>
-  
-  <textarea id="input" placeholder="Type your secret message..."></textarea><br>
-  <button onclick="encode()">Encode 🔒</button>
-  <button onclick="decode()">Decode 🔓</button>
-  <button onclick="copyOutput()">Copy 📋</button>
-  <button onclick="resetAll()">Reset ♻️</button>
+<div class="card">
+<h1>🌐 Glyphmoji (Low/High Security)</h1>
+<p class="small">Choose Security Mode → Low = Unicode, High = Custom Emoji Cipher</p>
 
-  <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
+<div class="row controls">
+  <label><input type="radio" name="sec" value="low" checked> Low Security</label>
+  <label><input type="radio" name="sec" value="high"> High Security</label>
+</div>
 
-  <script>
-    // Mapping (A-Z + space)
-    const map = {
-      "A": "😀", "B": "🐒", "C": "🌙", "D": "🍩", "E": "🥚",
-      "F": "🍟", "G": "🦍", "H": "🏠", "I": "🍦", "J": "🕹️",
-      "K": "🔑", "L": "🍋", "M": "🌝", "N": "🎶", "O": "🍊",
-      "P": "🥞", "Q": "❓", "R": "🌈", "S": "⭐", "T": "🌴",
-      "U": "☂️", "V": "🌋", "W": "🌊", "X": "❌", "Y": "🍸",
-      "Z": "⚡", " ": "⬜"
-    };
+<textarea id="input" placeholder="Type text here..."></textarea>
 
-    const reverseMap = Object.fromEntries(
-      Object.entries(map).map(([k,v]) => [v,k])
-    );
+<div class="row controls">
+  <button onclick="encode()">Encode</button>
+  <button onclick="decode()">Decode</button>
+  <button class="muted" onclick="copyOutput()">Copy</button>
+  <button class="muted" onclick="resetAll()">Reset</button>
+  <button class="muted" onclick="toggleChart()">Show/Hide Chart</button>
+</div>
 
-    function encode() {
-      let text = document.getElementById("input").value.toUpperCase();
-      let encoded = text.split("").map(ch => map[ch] || ch).join("");
-      document.getElementById("output").value = encoded;
+<textarea id="output" readonly placeholder="Result will appear here..."></textarea>
+
+<div id="chartArea" style="display:none;margin-top:14px">
+  <h3 style="margin-bottom:6px">📖 Cipher Chart (High Security)</h3>
+  <table class="chart"></table>
+  <p class="small">Codes shown as <code>#01</code> etc. Space = <code>#00</code></p>
+</div>
+</div>
+
+<script>
+/***************
+ * MAPPING (High Security)
+ ***************/
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const emojiList = ["😀","🐒","🌙","🍩","🥚","🍟","🦍","🏠","🍦","🕹️","🔑","🍋","🌝","🎶","🍊","🥞","❓","🌈","⭐","🌴","☂️","🌋","🌊","❌","🍸","⚡"];
+const MAP = {};
+const EMOJI_TO_LETTER = {};
+const CODE_TO_LETTER = {};
+
+for(let i=0;i<letters.length;i++){
+  const L = letters[i];
+  const emoji = emojiList[i] || "🔹";
+  const code = "#"+String(i+1).padStart(2,"0");
+  MAP[L] = {emoji, code};
+  EMOJI_TO_LETTER[emoji] = L;
+  CODE_TO_LETTER[code] = L;
+}
+MAP[" "] = {emoji:"⬜", code:"#00"};
+EMOJI_TO_LETTER["⬜"]=" ";
+CODE_TO_LETTER["#00"]=" ";
+
+const EXTRA = {"NJAN":"🙋‍♂️","NEE":"👉","SNEHAM":"❤️","ONAM":"🌼","KAZHINJU":"✅"};
+for(const [w,e] of Object.entries(EXTRA)){ EMOJI_TO_LETTER[e]=w; }
+
+function buildChart(){
+  const tbl=document.querySelector(".chart"); tbl.innerHTML="";
+  let row;
+  for(let i=0;i<letters.length;i+=3){
+    row=document.createElement("tr");
+    for(let j=0;j<3;j++){
+      const idx=i+j;
+      if(idx<letters.length){
+        const L=letters[idx], e=MAP[L].emoji, c=MAP[L].code;
+        ["td","td","td"].forEach((_,k)=>{
+          const td=document.createElement("td");
+          td.innerText=k===0?L:k===1?e:c;
+          row.appendChild(td);
+        });
+      }else{row.appendChild(document.createElement("td")); row.appendChild(document.createElement("td")); row.appendChild(document.createElement("td"))}
     }
+    tbl.appendChild(row);
+  }
+  const row2=document.createElement("tr"); row2.innerHTML="<td>Space</td><td>⬜</td><td>#00</td>"; tbl.appendChild(row2);
+  const exRow=document.createElement("tr");
+  exRow.innerHTML="<td colspan='3'><strong>Extras:</strong> "+Object.entries(EXTRA).map(([w,e])=>`<span class='pill'>${w}→${e}</span>`).join(" ")+"</td>";
+  tbl.appendChild(exRow);
+}
+buildChart();
 
-    function decode() {
-      let text = document.getElementById("input").value;
-      let decoded = "";
-      for (let ch of text) {
-        decoded += reverseMap[ch] || ch;
+// UI helpers
+function toggleChart(){ const el=document.getElementById("chartArea"); el.style.display=(el.style.display==="none"?"block":"none"); }
+function copyOutput(){ const out=document.getElementById("output"); out.select(); out.setSelectionRange(0,999999); navigator.clipboard.writeText(out.value).then(()=>alert("Copied ✅"));}
+function resetAll(){ document.getElementById("input").value=""; document.getElementById("output").value=""; }
+function getMode(){ return document.querySelector('input[name="sec"]:checked').value; }
+
+// ENCODE
+function encode(){
+  const raw=document.getElementById("input").value||"";
+  const mode=getMode();
+  if(mode==="low"){ // Universal Unicode
+    const out=[...raw].map(c => "\\u"+c.codePointAt(0).toString(16).toUpperCase().padStart(4,"0")).join(" ");
+    document.getElementById("output").value=out;
+  }else{ // High Security Emoji
+    const tokens=raw.split("");
+    const out=tokens.map(ch=>{
+      const up=ch.toUpperCase();
+      if(MAP[up]) return MAP[up].emoji;
+      if(EXTRA[up]) return EXTRA[up];
+      return ch;
+    }).join("");
+    document.getElementById("output").value=out;
+  }
+}
+
+// DECODE
+function decode(){
+  const raw=document.getElementById("input").value||"";
+  const mode=getMode();
+  if(mode==="low"){ // Unicode → letters
+    const parts=raw.split(/\s+/).filter(Boolean);
+    const out=parts.map(p=>{
+      if(/\\u[0-9A-F]{4,6}$/i.test(p)){
+        return String.fromCodePoint(parseInt(p.replace("\\u",""),16));
       }
-      document.getElementById("output").value = decoded;
+      return p;
+    }).join("");
+    document.getElementById("output").value=out;
+  }else{ // Emoji → letters
+    const emojis=Object.keys(EMOJI_TO_LETTER).sort((a,b)=>b.length-a.length);
+    let i=0, out="";
+    while(i<raw.length){
+      let matched=false;
+      for(const e of emojis){
+        if(raw.startsWith(e,i)){ out+=EMOJI_TO_LETTER[e]; i+=e.length; matched=true; break; }
+      }
+      if(!matched){ out+=raw[i]; i++; }
     }
-
-    function copyOutput() {
-      let out = document.getElementById("output");
-      out.select();
-      out.setSelectionRange(0, 99999); // mobile support
-      navigator.clipboard.writeText(out.value);
-      alert("Copied to clipboard! ✅");
-    }
-
-    function resetAll() {
-      document.getElementById("input").value = "";
-      document.getElementById("output").value = "";
-    }
-  </script>
-  <h2>📖 Emoji Cipher Chart</h2>
-<table border="1" style="margin:auto; border-collapse:collapse; font-size:20px;">
-  <tr><td>A</td><td>😀</td><td>B</td><td>🐒</td><td>C</td><td>🌙</td></tr>
-  <tr><td>D</td><td>🍩</td><td>E</td><td>🥚</td><td>F</td><td>🍟</td></tr>
-  <tr><td>G</td><td>🦍</td><td>H</td><td>🏠</td><td>I</td><td>🍦</td></tr>
-  <tr><td>J</td><td>🕹️</td><td>K</td><td>🔑</td><td>L</td><td>🍋</td></tr>
-  <tr><td>M</td><td>🌝</td><td>N</td><td>🎶</td><td>O</td><td>🍊</td></tr>
-  <tr><td>P</td><td>🥞</td><td>Q</td><td>❓</td><td>R</td><td>🌈</td></tr>
-  <tr><td>S</td><td>⭐</td><td>T</td><td>🌴</td><td>U</td><td>☂️</td></tr>
-  <tr><td>V</td><td>🌋</td><td>W</td><td>🌊</td><td>X</td><td>❌</td></tr>
-  <tr><td>Y</td><td>🍸</td><td>Z</td><td>⚡</td><td>Space</td><td>⬜</td></tr>
-</table>
+    document.getElementById("output").value=out;
+  }
+}
+</script>
+<ul class="nice-list">
+<li>You can easily encode and decode.</li>
+<li>If you encode a custom emoji cipher on this site, it can only be decoded here.</li>
+<li>If you encoded Unicode (UTF-8) on this site, you can decode it on other sites.</li>
+</ul>
+<br><marquee>Thanks for visiting</marquee>
 </body>
 </html>
