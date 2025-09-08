@@ -48,7 +48,7 @@ button{padding:10px 14px;border-radius:10px;border:0;background:#5b21b6;color:#f
 <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
 
 <div id="chartArea" style="display:none;margin-top:14px">
-  <h3 style="margin-bottom:6px">📖 Cipher Chart (High Security)</h3>
+  <h3 style="margin-bottom:6px">📖 Cipher Chart (Custom Emoji cipher)</h3>
   <table class="chart"></table>
   <p class="small">Codes shown as <code>#01</code> etc. Space = <code>#00</code></p>
 </div>
@@ -58,8 +58,8 @@ button{padding:10px 14px;border-radius:10px;border:0;background:#5b21b6;color:#f
 /***************
  * MAPPING (High Security)
  ***************/
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZഅആഇഈഉഊഋഎഏഐഒഓഔഅംഅഃകഖഗഘങ";
-const emojiList = ["😀","🐒","🌙","🍩","🥚","🍟","🦍","🏠","🍦","🕹️","🔑","🍋","🌝","🎶","🍊","🥞","❓","🌈","⭐","🌴","☂️","🌋","🌊","❌","🍸","⚡","👶🏻","🧒🏻","👦🏻","👧🏻',"🧑🏻',"👱🏻","👨🏻","🧔🏻","🧔🏻‍♂️","🧔🏻‍♀️","👱🏻‍♂️","🧑🏻‍🦰","👨🏻‍🦰","👩🏻‍🦰","🧑🏻‍🦳","👨🏻‍🦳","👩🏻‍🦳","🧑🏻‍🦲","👨🏻‍🦲","👩🏻‍🦲"];
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const emojiList = ["😀","🐒","🌙","🍩","🥚","🍟","🦍","🏠","🍦","🕹️","🔑","🍋","🌝","🎶","🍊","🥞","❓","🌈","⭐","🌴","☂️","🌋","🌊","❌","🍸","⚡"];
 const MAP = {};
 const EMOJI_TO_LETTER = {};
 const CODE_TO_LETTER = {};
